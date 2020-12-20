@@ -37,14 +37,14 @@ def extract(index, video_path, flows_path, frame_size, quality):
     for i in range(1, length):
         ret, frame_next = cap.read()
         
+        if failed >= maximum_failure:
+            message = "[ERROR] falied to read a video from '{}'".format(video_path)
+            raise Exception(message)
+        
         if not ret:
             print("[WARNING] falied to read a frame from '{}'".format(video_path))
             failed += 1
             continue
-
-        if failed >= maximum_failure:
-            message = "[ERROR] falied to read a video from '{}'".format(video_path)
-            raise Exception(message)
 
         # convert to gray(next)
         frame_next_gray = cv2.cvtColor(frame_next, cv2.COLOR_BGR2GRAY)
