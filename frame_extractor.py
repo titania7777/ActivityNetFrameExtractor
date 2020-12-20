@@ -13,7 +13,7 @@ if __name__ == "__main__":
     parser.add_argument("--videos-path", type=str, default="./videos/")
     parser.add_argument("--frames-path", type=str, default="./frames/")
     parser.add_argument("--flows-path", type=str, default="./flows/")
-    parser.add_argument("--frame-size", type=int, default=320)
+    parser.add_argument("--frame-size", type=int, default=480) # 480x270, 320x180
     parser.add_argument("--quality", type=int, default=30)
     parser.add_argument("--flow-mode", action="store_true")
     parser.add_argument("--workers", type=int, default=16)
@@ -38,8 +38,15 @@ if __name__ == "__main__":
             [i, len(videos_path)], video_path, args.flows_path, args.frame_size, args.quality) for i, video_path in enumerate(videos_path)
         )
     else:
-        stats = Parallel(
-            n_jobs=args.workers, backend="threading"
-        )(delayed(frame.extract)(
-            [i, len(videos_path)], video_path, args.frames_path, args.frame_size, args.quality, args.use_gpu) for i, video_path in enumerate(videos_path)
-        )
+        if args.use_gpu:
+            stats = Parallel(
+                n_jobs=args.workers, backend="threading"
+            )(delayed(frame.extract_gpu)(
+                [i, len(videos_path)], video_path, args.frames_path, args.frame_size, args.quality) for i, video_path in enumerate(videos_path)
+            )
+        else:
+            stats = Parallel(
+                n_jobs=args.workers, backend="threading"
+            )(delayed(frame.extract_cpu)(
+                [i, len(videos_path)], video_path, args.frames_path, args.frame_size, args.quality) for i, video_path in enumerate(videos_path)
+            )
