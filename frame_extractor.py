@@ -6,19 +6,14 @@ import flow
 from glob import glob
 from joblib import Parallel, delayed
 
-# ./videos
-#     L a.mp4
-#     L b.mkv
-#     L c.webm
-#         .
-#         .
-
+# this code working for ActivityNet dataset
+# http://activity-net.org/index.html
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--videos-path", type=str, default="./videos/")
     parser.add_argument("--frames-path", type=str, default="./frames/")
     parser.add_argument("--flows-path", type=str, default="./flows/")
-    parser.add_argument("--frame_size", type=int, default=320)
+    parser.add_argument("--frame-size", type=int, default=320)
     parser.add_argument("--quality", type=int, default=30)
     parser.add_argument("--flow-mode", action="store_true")
     parser.add_argument("--workers", type=int, default=16)
