@@ -32,13 +32,17 @@ def extract(index, video_path, flows_path, frame_size, quality):
     print("{}/{} name: {} length: {}".format(index[0]+1, index[1], filename, length))
 
     # read and save
+    maximum_failure = 20
     failed = 0
     for i in range(1, length):
         ret, frame_next = cap.read()
+        
         if not ret:
             print("[WARNING] falied to read a frame from '{}'".format(video_path))
             failed += 1
-        if failed >= int(length / 10):
+            continue
+
+        if failed >= maximum_failure:
             message = "[ERROR] falied to read a video from '{}'".format(video_path)
             raise Exception(message)
 
