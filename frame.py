@@ -55,16 +55,16 @@ def extract_cpu(index, video_path, frame_path, frame_size, quality):
     for i in range(length):
         ret, frame = cap.read()
 
+        # failure
+        if failed >= maximum_failure:
+            message = "[ERROR] falied to read a video from '{}'".format(video_path)
+            raise Exception(message)
+        
         # missing frame
         if not ret:
             print("[WARNING] falied to read a frame from '{}'".format(video_path))
             failed += 1
             continue
-        
-        # failure
-        if failed >= maximum_failure:
-            message = "[ERROR] falied to read a video from '{}'".format(video_path)
-            raise Exception(message)
         
         # save
         image = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
