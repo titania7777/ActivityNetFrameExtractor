@@ -22,10 +22,10 @@ then you can run a script like below.
 
 extract only frames
 ```
-python frame_extractor.py --videos-path ./v1-3/train/ --frames-path ./frames/ --frame-size 320 --quality 30 --workers 16 --use-gpu
+python frame_extractor.py --videos-path ./v1-3/train/ --frames-path ./frames/ --frame-size 480 --quality 30 --workers 16 --use-gpu
 ```
 
 extract only optical flows
 ```
-python frame_extractor.py --videos-path ./v1-3/train/ --flows-path ./flows/ --frame-size 320 --quality 30 --workers 8 --flow-mode
+python frame_extractor.py --videos-path ./v1-3/train/ --flows-path ./flows/ --frame-size 480 --quality 30 --workers 16 --flow-mode
 ```
