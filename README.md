@@ -1,7 +1,7 @@
 # ActivityNetFrameExtractor
-the frame extractor for ActivityNet with GPU Accelaration, powered by [Decord](https://github.com/dmlc/decord#bridges-for-deep-learning-frameworks)
+the frame extractor for ActivityNet with GPU Accelaration, powered by [Decord](https://github.com/dmlc/decord)
 
-* if you want to use GPU then you will need install from the source, detail is follow the readme of Decord repository
+* if you want to use GPU then you will need install from the source, detail is follow the [readme](https://github.com/dmlc/decord#installation) of Decord repository
 
 ## My Environment Setting
 
