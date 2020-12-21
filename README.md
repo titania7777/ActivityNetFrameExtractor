@@ -32,4 +32,5 @@ python frame_extractor.py --videos-path ./v1-3/train/ --flows-path ./flows/ --fr
 ```
 
 i use the ffmpeg when using a cpu, do if you need consider of quality then check it below formula
+
 ffmpeg_qscale = (1 - args_quality) * 30 + 1
