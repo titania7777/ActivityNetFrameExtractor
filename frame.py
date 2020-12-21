@@ -1,12 +1,13 @@
 import os
-import cv2
-from PIL import Image
+import ffmpeg
+import numpy as np
+from PIL import Image # pillow-simd
 from decord import VideoReader
 from decord import gpu
 
 def extract_gpu(index, video_path, frame_path, frame_size, quality):
-    # remove 'v_' and extension
-    filename = video_path.split("/")[-1][2:].split(".")[0]
+    # get filename
+    filename = video_path.split("/")[-1][:-4]
 
     # make a save directory
     frame_path = os.path.join(frame_path, filename)
@@ -29,45 +30,38 @@ def extract_gpu(index, video_path, frame_path, frame_size, quality):
     for i in range(length):
         frame = video_reader[i]
         image = Image.fromarray(frame.asnumpy())
-        image.thumbnail([frame_size, frame_size])
-        image.save(os.path.join(frame_path, "{}.jpg".format(i)), quality=quality)
+        image.thumbnail([frame_size, frame_size]) # thumbnail
+        image.save(os.path.join(frame_path, "{}.jpeg".format(i)), quality=int(quality*100))
 
 def extract_cpu(index, video_path, frame_path, frame_size, quality):
-    # remove 'v_' and extension
-    filename = video_path.split("/")[-1][2:].split(".")[0]
+    # get filename
+    filename = video_path.split("/")[-1][:-4]
 
     # make a save directory
     frame_path = os.path.join(frame_path, filename)
     os.makedirs(frame_path)
 
-    # load a video
-    cap = cv2.VideoCapture(video_path)
-
-    # get length info from video
-    length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    # get probe to get information
+    probe = ffmpeg.probe(video_path)
+    streams = probe["streams"][0]
+    
+    # get information from the probe
+    width = streams["width"]
+    height = streams["height"]
+    codec_type = streams["codec_type"]
+    length = streams["nb_frames"]
 
     # message
     print("{}/{} name: {} length: {}".format(index[0]+1, index[1], filename, length))
-
+    
     # read and save
-    maximum_failure = 20
-    failed = 0
-    for i in range(length):
-        ret, frame = cap.read()
-
-        # failure
-        if failed >= maximum_failure:
-            message = "[ERROR] falied to read a video from '{}'".format(video_path)
-            raise Exception(message)
-        
-        # missing frame
-        if not ret:
-            print("[WARNING] falied to read a frame from '{}'".format(video_path))
-            failed += 1
-            continue
-        
-        # save
-        image = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-        image.thumbnail([frame_size, frame_size])
-        image.save(os.path.join(frame_path, "{}.jpg".format(i)), quality=quality)
-    cap.release()
+    if codec_type == "video":
+        (ffmpeg
+        .input(video_path)
+        .filter("scale", frame_size, -1) # thumbnail
+        .output(os.path.join(frame_path, "%d.jpeg"), qscale=quality, format="image2", vcodec="mjpeg")
+        .global_args(*["-loglevel", "error", "-threads", "1"])
+        .run(capture_stdout=True, capture_stderr=True))
+    else:
+        message = "[ERROR] type is not supported '{}'".format(video_path)
+        raise Exception(message)
