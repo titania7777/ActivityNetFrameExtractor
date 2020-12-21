@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 from PIL import Image # pillow-simd
 
-def extract(index, video_path, flows_path, frame_size, quality, err_rate=0.05):
+def extract(index, video_path, flows_path, frame_size, quality, origin_size, err_rate=0.05):
     # get filename
     filename = video_path.split("/")[-1][:-4]
 
@@ -55,7 +55,8 @@ def extract(index, video_path, flows_path, frame_size, quality, err_rate=0.05):
         
         # save
         image = Image.fromarray(cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB))
-        image.thumbnail([frame_size, frame_size])
+        if not origin_size:
+            image.thumbnail([frame_size, frame_size]) # thumbnail
         image.save(os.path.join(flows_path, "{}.jpeg".format(i - 1)), quality=int(quality*100))
         frame_prev_gray = frame_next_gray
     cap.release()
