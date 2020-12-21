@@ -1,11 +1,11 @@
 import os
 import cv2
 import numpy as np
-from PIL import Image
+from PIL import Image # pillow-simd
 
-def extract(index, video_path, flows_path, frame_size, quality):
-    # remove 'v_' and extension
-    filename = video_path.split("/")[-1][2:].split(".")[0]
+def extract(index, video_path, flows_path, frame_size, quality, err_rate=0.05):
+    # get filename
+    filename = video_path.split("/")[-1][:-4]
 
     # make a save directory
     flows_path = os.path.join(flows_path, filename)
@@ -32,19 +32,15 @@ def extract(index, video_path, flows_path, frame_size, quality):
     print("{}/{} name: {} length: {}".format(index[0]+1, index[1], filename, length))
 
     # read and save
-    maximum_failure = 20
     failed = 0
     for i in range(1, length):
         ret, frame_next = cap.read()
-        
-        if failed >= maximum_failure:
-            message = "[ERROR] falied to read a video from '{}'".format(video_path)
-            raise Exception(message)
-        
         if not ret:
             print("[WARNING] falied to read a frame from '{}'".format(video_path))
             failed += 1
-            continue
+        if failed >= int(length * err_rate):
+            message = "[ERROR] falied to read a video from '{}'".format(video_path)
+            raise Exception(message)
 
         # convert to gray(next)
         frame_next_gray = cv2.cvtColor(frame_next, cv2.COLOR_BGR2GRAY)
@@ -60,6 +56,6 @@ def extract(index, video_path, flows_path, frame_size, quality):
         # save
         image = Image.fromarray(cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB))
         image.thumbnail([frame_size, frame_size])
-        image.save(os.path.join(flows_path, "{}.jpg".format(i - 1)), quality=quality)
+        image.save(os.path.join(flows_path, "{}.jpeg".format(i - 1)), quality=int(quality*100))
         frame_prev_gray = frame_next_gray
     cap.release()
