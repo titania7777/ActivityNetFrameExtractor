@@ -7,7 +7,8 @@ the frame extractor for ActivityNet with GPU Accelaration, powered by [Decord](h
 
 *   Decord == 0.4.2
 *   opencv-python == 4.4.0.44
-*   pillow == 8.0.1
+*   pillow-simd == 7.0.0.post3
+*   ffmpeg-python == 0.2.0
 
 ## Usage
 first download the ActivityNet use a [crawler](https://github.com/activitynet/ActivityNet/tree/master/Crawler) or [request](https://github.com/activitynet/ActivityNet/issues/57) and then you will get the follow structure.
@@ -20,12 +21,12 @@ first download the ActivityNet use a [crawler](https://github.com/activitynet/Ac
 ```
 then you can run a script like below.
 
-extract only frames
+extract only frames (cpu version, just remove '--use-gpu' flag)
 ```
-python frame_extractor.py --videos-path ./v1-3/train/ --frames-path ./frames/ --frame-size 480 --quality 30 --workers 16 --use-gpu
+python frame_extractor.py --videos-path ./v1-3/train/ --frames-path ./frames/ --frame-size 480 --quality 0.3 --use-gpu
 ```
 
 extract only optical flows
 ```
-python frame_extractor.py --videos-path ./v1-3/train/ --flows-path ./flows/ --frame-size 480 --quality 30 --workers 16 --flow-mode
+python frame_extractor.py --videos-path ./v1-3/train/ --flows-path ./flows/ --frame-size 480 --quality 0.3 --flow-mode
 ```
