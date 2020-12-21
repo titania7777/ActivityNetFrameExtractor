@@ -11,7 +11,7 @@ the frame extractor for Video Datasets with GPU Acceleration, powered by [Decord
 *   ffmpeg-python == 0.2.0
 
 ## Usage
-first download the Video Dataset, for example an ActivityNet use a [crawler](https://github.com/activitynet/ActivityNet/tree/master/Crawler) or [request](https://github.com/activitynet/ActivityNet/issues/57) and then you will get the follow structure
+* first download the Video Dataset, for example an ActivityNet use a [crawler](https://github.com/activitynet/ActivityNet/tree/master/Crawler) or [request](https://github.com/activitynet/ActivityNet/issues/57) and then you will get the follow structure
 
 ```
    v1-3 (ActivityNet version 1.3)
@@ -21,15 +21,16 @@ first download the Video Dataset, for example an ActivityNet use a [crawler](htt
 ```
 then you can run a script like below
 
-extract only frames (cpu version, just remove '--use-gpu' flag)
+* extract only frames (cpu version, just remove '--use-gpu' flag)
 ```
 python frame_extractor.py --videos-path ./v1-3/train/ --frames-path ./frames/ --frame-size 360 --quality 0.7 --use-gpu
 ```
 
-extract only optical flows (only cpu)
+* extract only optical flows (only cpu)
 ```
 python frame_extractor.py --videos-path ./v1-3/train/ --flows-path ./flows/ --frame-size 360 --quality 0.7 --flow-mode
 ```
+* if you want get origin size of frames in video then adds '--origin-size' flag
 
 i use the ffmpeg when using a cpu, do if you need consider of quality then check it below formula
 
