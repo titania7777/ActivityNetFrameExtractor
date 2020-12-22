@@ -23,15 +23,32 @@ then you can run a script like below
 
 * extract only frames (cpu version, just remove '--use-gpu' flag)
 ```
-python frame_extractor.py --videos-path ./v1-3/train/ --frames-path ./frames/ --frame-size 360 --quality 0.7 --use-gpu
+python frame_extractor.py --videos-path ./v1-3/train/ --frames-path ./frames/ --frame-size 240 --quality 0.7 --use-gpu
 ```
 
 * extract only optical flows (only cpu)
 ```
-python frame_extractor.py --videos-path ./v1-3/train/ --flows-path ./flows/ --frame-size 360 --quality 0.7 --flow-mode
+python frame_extractor.py --videos-path ./v1-3/train/ --flows-path ./flows/ --frame-size 240 --quality 0.7 --flow-mode
 ```
 * if you want get origin size of frames in video then adds '--origin-size' flag
 
-i use the ffmpeg when using a cpu, do if you need consider of quality then check it below formula
+i use the ffmpeg when using a cpu, do if you need consider of quality then check it below formula and table
 
 ffmpeg_qscale = (1 - args_quality) * 30 + 1
+
+args_quality = (31 - ffmpeg_qscale) / 30
+
+args_quality | ffmpeg_qscale
+-- | -- 
+1.0 | 1
+0.9 | 4
+0.8 | 7
+0.7 | 10
+0.6 | 13
+0.5 | 16
+0.4 | 19
+0.3 | 22
+0.2 | 25
+0.1 | 28
+0.05 | 29.5
+0.0 | 31
