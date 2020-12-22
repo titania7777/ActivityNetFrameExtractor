@@ -13,7 +13,7 @@ if __name__ == "__main__":
     parser.add_argument("--flows-path", type=str, default="./flows/")
     parser.add_argument("--frame-size", type=int, default=240)
     parser.add_argument("--quality", type=float, default=0.8)
-    parser.add_argument("--batch_size", type=int, default=1)
+    parser.add_argument("--batch-size", type=int, default=1)
     parser.add_argument("--aspect-ratio", type=str, default="4:3")
     parser.add_argument("--workers", type=int, default=-1)
     parser.add_argument("--flow-mode", action="store_true")

@@ -55,8 +55,8 @@ def extract_cpu(index, video_path, frame_path, frame_size, quality, origin_size,
     # read and save
     pipe = ffmpeg.input(video_path)
     if not origin_size:
-        pipe = pipe.filter("scale", height, width) # thumbnail
-    pipe = pipe.output(os.path.join(frame_path, "%d.jpeg"), qscale=(1-quality)*30+1, format="image2", vcodec="mjpeg")
+        pipe = pipe.filter("scale", width, height) # thumbnail
+    pipe = pipe.output(os.path.join(frame_path, "%d.jpeg"), qscale=(1-quality)*30+1)
     pipe = pipe.global_args(*["-loglevel", "error", "-threads", "1"])
     pipe.run()
     
