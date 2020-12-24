@@ -5,33 +5,35 @@ import numpy as np
 from PIL import Image # pillow-simd
 import utils
 
-def extract(index, video_path, flows_path, frame_size, quality, origin_size):
+def extract(index, video_path, start_point, flows_path, frame_size, quality, origin_size):
     # get filename and make a save directory
-    filename, flows_path = utils.get_filename_frame_path(video_path, flows_path)
+    filename, flows_path = utils.get_filename_frame_path(start_point, video_path, flows_path)
 
-    # read a informations
-    cap = cv2.VideoCapture(video_path)
-    length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    cap.release()
+    # get information
+    width_original, height_original, length = utils.get_info(video_path)
 
     # load a video
     out, _ = (
         ffmpeg
         .input(video_path)
         .output("pipe:", format="rawvideo", pix_fmt="rgb24")
-        .global_args(*["-loglevel", "error", "-threads", "1"])
+        .global_args(*["-loglevel", "error", "-threads", "1", "-nostdin"])
         .run(capture_stdout=True, capture_stderr=True)
     )
     video = (
         np
         .frombuffer(out, np.uint8)
-        .reshape([-1, height, width, 3])
+        .reshape([-1, height_original, width_original, 3])
     )
 
+    # resizing
+    if not origin_size:
+        width_resize, height_resize = utils.frame_resizing(width_original, height_original, frame_size)
+    else:
+        width_resize, height_resize = width_original, height_original
+
     # message
-    print(f"{index[0]+1}/{index[1]} ({width}x{height}) length: {length:<{5}} name: {filename}")
+    print(f"{index[0]+1}/{index[1]} ({width_original}x{height_original}) -> ({width_resize}x{height_resize}) length: {length:<{5}} name: {filename}")
 
     # read a first frame and conver to gray scale
     frame_first = video[0]
@@ -58,7 +60,6 @@ def extract(index, video_path, flows_path, frame_size, quality, origin_size):
 
         # save
         image = Image.fromarray(cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB))
-        if not origin_size:
-            image.thumbnail(utils.frame_resizing(height, width, frame_size)) # thumbnail
+        image.thumbnail([width_resize, height_resize])
         image.save(os.path.join(flows_path, "{}.jpeg".format(i - 1)), quality=int(quality*100))
         frame_prev_gray = frame_next_gray

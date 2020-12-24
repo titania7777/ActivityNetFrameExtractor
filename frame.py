@@ -1,13 +1,15 @@
 import os
+import sys
 import utils
 
-def extract_gpu(index, video_path, frame_path, frame_size, quality, origin_size, batch_size):
+# ffmpeg GPU: https://github.com/kkroening/ffmpeg-python/issues/284
+def extract_gpu(index, video_path, start_point, frame_path, frame_size, quality, origin_size, batch_size):
     from decord import VideoReader
     from decord import gpu
     from PIL import Image # pillow-simd
 
     # get filename and make a save directory
-    filename, frame_path = utils.get_filename_frame_path(video_path, frame_path)
+    filename, frame_path = utils.get_filename_frame_path(start_point, video_path, frame_path)
 
     # load a video
     video_reader = VideoReader(video_path, ctx=gpu(0))
@@ -18,9 +20,18 @@ def extract_gpu(index, video_path, frame_path, frame_size, quality, origin_size,
     if length == 0:
         message = "[ERROR] falied to read a video from '{}'".format(video_path)
         raise Exception(message)
+    
+    # get information
+    width_original, height_original, _ = utils.get_info(video_path)
+
+    # resizing
+    if not origin_size:
+        width_resize, height_resize = utils.frame_resizing(width_original, height_original, frame_size)
+    else:
+        width_resize, height_resize = width_original, height_original
 
     # message
-    print("{}/{} name: {} length: {}".format(index[0]+1, index[1], filename, length))
+    print(f"{index[0]+1}/{index[1]} ({width_original}x{height_original}) -> ({width_resize}x{height_resize}) length: {length:<{5}} name: {filename}")
 
     # read and save
     index = 0
@@ -29,33 +40,34 @@ def extract_gpu(index, video_path, frame_path, frame_size, quality, origin_size,
         for frame in frames:
             height, width, _ = frame.shape
             frame = Image.fromarray(frame)
-            if not origin_size:
-                frame.thumbnail(utils.frame_resizing(height, width, frame_size)) # thumbnail
+            frame.thumbnail([width_resize, height_resize])
             frame.save(os.path.join(frame_path, "{}.jpeg".format(index)), quality=int(quality*100))
             index += 1
 
-def extract_cpu(index, video_path, frame_path, frame_size, quality, origin_size):
+def extract_cpu(index, video_path, start_point, frame_path, frame_size, quality, origin_size):
     import cv2
     import ffmpeg
+
     # get filename and make a save directory
-    filename, frame_path = utils.get_filename_frame_path(video_path, frame_path)
+    filename, frame_path = utils.get_filename_frame_path(start_point, video_path, frame_path)
 
-    # read a informations
-    cap = cv2.VideoCapture(video_path)
-    length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    cap.release()
+    # get information
+    width_original, height_original, length = utils.get_info(video_path)
 
-    height, width = utils.frame_resizing(height, width, frame_size)
+    # resizing
+    if not origin_size:
+        width_resize, height_resize = utils.frame_resizing(width_original, height_original, frame_size)
+    else:
+        width_resize, height_resize = width_original, height_original
 
     # message
-    print(f"{index[0]+1}/{index[1]} ({width}x{height}) length: {length:<{5}} name: {filename}")
+    print(f"{index[0]+1}/{index[1]} ({width_original}x{height_original}) -> ({width_resize}x{height_resize}) length: {length:<{5}} name: {filename}")
 
     # read and save
-    pipe = ffmpeg.input(video_path)
-    if not origin_size:
-        pipe = pipe.filter("scale", width, height) # thumbnail
-    pipe = pipe.output(os.path.join(frame_path, "%d.jpeg"), qscale=(1-quality)*30+1)
-    pipe = pipe.global_args(*["-loglevel", "error", "-threads", "1"])
-    pipe.run()
+    (
+        ffmpeg.input(video_path)
+        .filter("scale", width_resize, height_resize)
+        .output(os.path.join(frame_path, "%d.jpeg"), qscale=(1-quality)*30+1)
+        .global_args(*["-loglevel", "error", "-threads", "1", "-nostdin"])
+        .run()
+    )

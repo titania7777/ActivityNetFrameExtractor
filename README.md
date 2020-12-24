@@ -1,7 +1,15 @@
 # FrameExtractor
+
+<table style="border:0px">
+  <tr>
+    <td><img src="samples/rgb.gif"></td>
+    <td><img src="samples/flow.gif"></td>
+  </rt>
+</table>
+
 the frame extractor for Video Datasets with GPU Acceleration, powered by [Decord](https://github.com/dmlc/decord)
 
-* if you want to use GPU then you will need install from the source, detail is follow the [readme](https://github.com/dmlc/decord#installation) of Decord repository
+* if you want to use GPU then you will need to install from the source, detail is follow the [readme](https://github.com/dmlc/decord#installation) of Decord repository
 
 ## My Environment Setting
 

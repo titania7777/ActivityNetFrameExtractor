@@ -22,15 +22,15 @@ if __name__ == "__main__":
 
     # directory check
     assert os.path.exists(args.videos_path) is True, "'{}' directory is not exist !!".format(args.videos_path)
-    if args.flow_mode:
-        assert os.path.exists(args.flows_path) is False, "'{}' directory is already exist !!".format(args.flows_path)
-    else:
-        assert os.path.exists(args.frames_path) is False, "'{}' directory is already exist !!".format(args.frames_path)
+    assert os.path.exists(args.flows_path if args.flow_mode else args.frames_path) is False, "'{}' directory is already exist !!".format(args.flows_path)
+    
+    # ues it for make a frame directories
+    start_point = len(os.path.join(args.videos_path, "hello").split("/")) - 1
 
     # get videos path
-    videos_path = glob(os.path.join(args.videos_path, "*"))
+    videos_path = glob(os.path.join(args.videos_path, "**/*.*"), recursive=True)
 
-    arguments = [args.flows_path if args.flow_mode else args.frames_path, args.frame_size, args.quality, args.origin_size]
+    arguments = [start_point, args.flows_path if args.flow_mode else args.frames_path, args.frame_size, args.quality, args.origin_size]
     if args.use_gpu:
         arguments.append(args.batch_size)
 
@@ -40,4 +40,4 @@ if __name__ == "__main__":
         extractor = frame.extract_gpu if args.use_gpu else frame.extract_cpu
     
     # run
-    stats = Parallel(n_jobs=args.workers, backend="threading")(delayed(extractor)([i, len(videos_path)], video_path, *arguments) for i, video_path in enumerate(videos_path))
+    Parallel(n_jobs=args.workers, backend="threading")(delayed(extractor)([i, len(videos_path)], video_path, *arguments) for i, video_path in enumerate(videos_path))
