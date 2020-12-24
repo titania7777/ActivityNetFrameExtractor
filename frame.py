@@ -1,13 +1,11 @@
 import os
-import cv2
-import ffmpeg
-import numpy as np
-from PIL import Image # pillow-simd
-from decord import VideoReader
-from decord import gpu
 import utils
 
-def extract_gpu(index, video_path, frame_path, frame_size, quality, origin_size, aspect_ratio, batch_size):
+def extract_gpu(index, video_path, frame_path, frame_size, quality, origin_size, batch_size):
+    from decord import VideoReader
+    from decord import gpu
+    from PIL import Image # pillow-simd
+
     # get filename and make a save directory
     filename, frame_path = utils.get_filename_frame_path(video_path, frame_path)
 
@@ -32,11 +30,13 @@ def extract_gpu(index, video_path, frame_path, frame_size, quality, origin_size,
             height, width, _ = frame.shape
             frame = Image.fromarray(frame)
             if not origin_size:
-                frame.thumbnail(utils.frame_resizing(height, width, frame_size, aspect_ratio)) # thumbnail
+                frame.thumbnail(utils.frame_resizing(height, width, frame_size)) # thumbnail
             frame.save(os.path.join(frame_path, "{}.jpeg".format(index)), quality=int(quality*100))
             index += 1
 
-def extract_cpu(index, video_path, frame_path, frame_size, quality, origin_size, aspect_ratio):
+def extract_cpu(index, video_path, frame_path, frame_size, quality, origin_size):
+    import cv2
+    import ffmpeg
     # get filename and make a save directory
     filename, frame_path = utils.get_filename_frame_path(video_path, frame_path)
 
@@ -47,10 +47,10 @@ def extract_cpu(index, video_path, frame_path, frame_size, quality, origin_size,
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     cap.release()
 
-    height, width = utils.frame_resizing(height, width, frame_size, aspect_ratio)
+    height, width = utils.frame_resizing(height, width, frame_size)
 
     # message
-    print("{}/{} name: {} length: {}".format(index[0]+1, index[1], filename, length))
+    print(f"{index[0]+1}/{index[1]} ({width}x{height}) length: {length:<{5}} name: {filename}")
 
     # read and save
     pipe = ffmpeg.input(video_path)
@@ -59,4 +59,3 @@ def extract_cpu(index, video_path, frame_path, frame_size, quality, origin_size,
     pipe = pipe.output(os.path.join(frame_path, "%d.jpeg"), qscale=(1-quality)*30+1)
     pipe = pipe.global_args(*["-loglevel", "error", "-threads", "1"])
     pipe.run()
-    

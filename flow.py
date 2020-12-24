@@ -3,11 +3,9 @@ import cv2
 import ffmpeg
 import numpy as np
 from PIL import Image # pillow-simd
-from decord import VideoReader
-from decord import gpu
 import utils
 
-def extract(index, video_path, flows_path, frame_size, quality, origin_size, aspect_ratio):
+def extract(index, video_path, flows_path, frame_size, quality, origin_size):
     # get filename and make a save directory
     filename, flows_path = utils.get_filename_frame_path(video_path, flows_path)
 
@@ -33,7 +31,7 @@ def extract(index, video_path, flows_path, frame_size, quality, origin_size, asp
     )
 
     # message
-    print("{}/{} name: {} length: {}".format(index[0]+1, index[1], filename, length))
+    print(f"{index[0]+1}/{index[1]} ({width}x{height}) length: {length:<{5}} name: {filename}")
 
     # read a first frame and conver to gray scale
     frame_first = video[0]
@@ -61,6 +59,6 @@ def extract(index, video_path, flows_path, frame_size, quality, origin_size, asp
         # save
         image = Image.fromarray(cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB))
         if not origin_size:
-            image.thumbnail(utils.frame_resizing(height, width, frame_size, aspect_ratio)) # thumbnail
+            image.thumbnail(utils.frame_resizing(height, width, frame_size)) # thumbnail
         image.save(os.path.join(flows_path, "{}.jpeg".format(i - 1)), quality=int(quality*100))
         frame_prev_gray = frame_next_gray

@@ -14,7 +14,6 @@ if __name__ == "__main__":
     parser.add_argument("--frame-size", type=int, default=240)
     parser.add_argument("--quality", type=float, default=0.8)
     parser.add_argument("--batch-size", type=int, default=1)
-    parser.add_argument("--aspect-ratio", type=str, default="4:3")
     parser.add_argument("--workers", type=int, default=-1)
     parser.add_argument("--flow-mode", action="store_true")
     parser.add_argument("--origin-size", action="store_true")
@@ -31,7 +30,7 @@ if __name__ == "__main__":
     # get videos path
     videos_path = glob(os.path.join(args.videos_path, "*"))
 
-    arguments = [args.flows_path if args.flow_mode else args.frames_path, args.frame_size, args.quality, args.origin_size, args.aspect_ratio.split(":")]
+    arguments = [args.flows_path if args.flow_mode else args.frames_path, args.frame_size, args.quality, args.origin_size]
     if args.use_gpu:
         arguments.append(args.batch_size)
 

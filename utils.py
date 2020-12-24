@@ -9,11 +9,14 @@ def get_filename_frame_path(video_path:str, frame_path:str) -> (str, str):
     os.makedirs(frame_path)
     return filename, frame_path
 
-def frame_resizing(height:int, width:int, frame_size, aspect_ratio) -> list:
+def frame_resizing(height:int, width:int, frame_size) -> list:
+    aspect_ratio = width / height
     if width > height:
-        height = frame_size
-        width = int((int(aspect_ratio[0])/int(aspect_ratio[1]))*height)
+        if height >= frame_size:
+            height = frame_size
+        width = int(aspect_ratio*height)
     else:
-        width = frame_size
-        height = int((int(aspect_ratio[1])/int(aspect_ratio[0]))*width)
+        if width >= frame_size:
+            width = frame_size
+        height = int(aspect_ratio*width)
     return [height, width]
