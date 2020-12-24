@@ -24,6 +24,9 @@ the frame extractor for Video Datasets with GPU Acceleration, powered by [Decord
 ```
    v1-3 (ActivityNet version 1.3)
      L train
+         L xxx.mp4
+             .
+             .
      L val
      L test
 ```
@@ -31,12 +34,12 @@ then you can run a script like below
 
 * extract only frames (cpu version, just remove '--use-gpu' flag)
 ```
-python frame_extractor.py --videos-path ./v1-3/train/ --frames-path ./frames/ --frame-size 240 --quality 0.7 --use-gpu
+python frame_extractor.py --videos-path ./v1-3/ --frames-path ./frames/ --frame-size 240 --quality 0.7 --use-gpu
 ```
 
 * extract only optical flows (only cpu)
 ```
-python frame_extractor.py --videos-path ./v1-3/train/ --flows-path ./flows/ --frame-size 240 --quality 0.7 --flow-mode
+python frame_extractor.py --videos-path ./v1-3/ --flows-path ./flows/ --frame-size 240 --quality 0.7 --flow-mode
 ```
 * if you want get origin size of frames in video then adds '--origin-size' flag
 
