@@ -68,6 +68,6 @@ def extract_cpu(index, video_path, start_point, frame_path, frame_size, quality,
         ffmpeg.input(video_path)
         .filter("scale", width_resize, height_resize)
         .output(os.path.join(frame_path, "%d.jpeg"), qscale=(1-quality)*30+1)
-        .global_args(*["-loglevel", "error", "-threads", "1", "-nostdin"])
+        .global_args("-loglevel", "error", "-threads", "1", "-nostdin")
         .run()
     )

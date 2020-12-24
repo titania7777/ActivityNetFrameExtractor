@@ -17,7 +17,7 @@ def extract(index, video_path, start_point, flows_path, frame_size, quality, ori
         ffmpeg
         .input(video_path)
         .output("pipe:", format="rawvideo", pix_fmt="rgb24")
-        .global_args(*["-loglevel", "error", "-threads", "1", "-nostdin"])
+        .global_args("-loglevel", "error", "-threads", "1", "-nostdin")
         .run(capture_stdout=True, capture_stderr=True)
     )
     video = (
